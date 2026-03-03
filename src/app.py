@@ -110,3 +110,20 @@ def signup_for_activity(activity_name: str, email: str):
     # Add student
     activity["participants"].append(email)
     return {"message": f"Signed up {email} for {activity_name}"}
+
+
+@app.delete("/activities/{activity_name}/withdraw")
+def withdraw_from_activity(activity_name: str, email: str):
+    """Remove a student from an activity (withdraw/cancel sign-up)"""
+    # Validate activity exists
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    activity = activities[activity_name]
+
+    # Ensure the student is currently signed up
+    if email not in activity["participants"]:
+        raise HTTPException(status_code=404, detail=f"Student {email} is not signed up for {activity_name}")
+
+    activity["participants"].remove(email)
+    return {"message": f"Removed {email} from {activity_name}"}
